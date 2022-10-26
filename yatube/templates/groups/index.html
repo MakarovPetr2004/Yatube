@@ -1,27 +1,28 @@
 {% extends 'base.html' %}
 
 {% block title %}
-    <title>{{ group }}</title>
+  <title>Записи сообщества {{ group }}</title>
 {% endblock %}
 
 {% block content %}
-    <main>
-        <div class="container">
-            <h1>{{ group }}</h1>
-            {% for post in posts %}
-                <ul>
-                    <li>
-                        Автор: {{ post.author.get_full_name }}
-                    </li>
-                    <li>
-                        Дата публикации: {{ post.pub_date|date:"d E Y" }}
-                    </li>
-                </ul>
-                <p>{{ post.text }}</p>
-                <a href="">все записи группы</a>
-                {% if not forloop.last %}
-                    <hr>{% endif %}
-            {% endfor %}
-        </div>
-    </main>
+  <main>
+    <div class="container">
+      <h1>{{ group }}</h1>
+      <p>{{ group.description }}</p>
+      {% for post in posts %}
+        <ul>
+          <li>
+            Автор: {{ post.author.get_full_name }}
+          </li>
+          <li>
+            Дата публикации: {{ post.pub_date|date:"d E Y" }}
+          </li>
+        </ul>
+        <p>{{ post.text }}</p>
+        <a href="">все записи группы</a>
+        {% if not forloop.last %}
+          <hr>{% endif %}
+      {% endfor %}
+    </div>
+  </main>
 {% endblock %}

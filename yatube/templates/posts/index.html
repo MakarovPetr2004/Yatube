@@ -1,27 +1,32 @@
 {% extends 'base.html' %}
 
 {% block title %}
-    <title>Последние обновления на сайте</title>
+  <title>Последние обновления на сайте</title>
 {% endblock %}
 
 {% block content %}
-    <main>
-        <div class="container">
-        <h1>Последние обновления на сайте</h1>
-            {% for post in posts %}
-                <ul>
-                    <li>
-                        Автор: {{ post.author.get_full_name }}
-                    </li>
-                    <li>
-                        Дата публикации: {{ post.pub_date|date:"d E Y" }}
-                    </li>
-                </ul>
-                <p>{{ post.text }}</p>
-                <a href="">все записи группы</a>
-                {% if not forloop.last %}
-                    <hr>{% endif %}
-            {% endfor %}
-        </div>
-    </main>
+  <main>
+    <div class="container">
+      <h1>Последние обновления на сайте</h1>
+      {% for post in posts %}
+        <ul>
+          <li>
+            Автор: {{ post.author.get_full_name }}
+          </li>
+          <li>
+            Дата публикации: {{ post.pub_date|date:"d E Y" }}
+          </li>
+        </ul>
+        <p>{{ post.text }}</p>
+        {% if post.group %}
+          <a href="{% url 'posts:group_list' post.group.slug %}">
+            Все записи группы
+          </a>
+        {% endif %}
+        {% if not forloop.last %}
+          <hr>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </main>
 {% endblock %}
