@@ -6,10 +6,10 @@ User = get_user_model()
 
 class Group(models.Model):
     title = models.TextField()
-    slug = models.TextField()
+    slug = models.TextField(unique=True)
     description = models.TextField()
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.title
 
 
@@ -27,5 +27,5 @@ class Post(models.Model):
         on_delete=models.CASCADE
     )
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.text

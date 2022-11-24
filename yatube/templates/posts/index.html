@@ -19,10 +19,16 @@
         </ul>
         <p>{{ post.text }}</p>
         {% if post.group %}
-          <a href="{% url 'posts:group_list' post.group.slug %}">
+          <li><a href="{% url 'posts:group_list' post.group.slug %}">
             Все записи группы
-          </a>
+          </a></li>
         {% endif %}
+        <li><a href="{% url 'posts:post_detail' post.pk %}">
+          Подробная информация
+        </a></li>
+        <li><a href="{% url 'posts:profile' post.author.username %}">
+          Все посты пользователя
+        </a></li>
         {% if not forloop.last %}
           <hr>
         {% endif %}
