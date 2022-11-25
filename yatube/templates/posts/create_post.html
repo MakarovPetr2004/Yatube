@@ -29,19 +29,19 @@
               {% csrf_token %}
               <div class="form-group row my-3 p-3">
                 <label for="id_text">
-                  Текст поста
+                  {{ form.text.label }}
                   <span class="required text-danger">*</span>
                 </label>
-                {{ form.text|addclass:'form-control'  }}
+                {{ form.text|addclass:'form-control' }}
                 <small id="id_text-help" class="form-text text-muted">
                   Текст нового поста
                 </small>
               </div>
               <div class="form-group row my-3 p-3">
                 <label for="id_group">
-                  Группа
+                  {{ form.group.label }}
                 </label>
-                {{ form.group|addclass:'form-control'  }}
+                {{ form.group|addclass:'form-control' }}
                 <small id="id_group-help" class="form-text text-muted">
                   Группа, к которой будет относиться пост
                 </small>
