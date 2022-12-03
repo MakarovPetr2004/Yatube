@@ -17,7 +17,6 @@
               {% else %}
                 Новый пост
               {% endif %}
-
             </div>
             <div class="card-body">
               {% if is_edit %}
@@ -33,18 +32,39 @@
                   <span class="required text-danger">*</span>
                 </label>
                 {{ form.text|addclass:'form-control' }}
-                <small id="id_text-help" class="form-text text-muted">
-                  Текст нового поста
-                </small>
+                {% if form.errors %}
+                  {% for field in form %}
+                    {% for error in field.errors %}
+                      <div class="alert alert-danger">
+                        {{ error|escape }}
+                      </div>
+                    {% endfor %}
+                  {% endfor %}
+                  {% for error in form.non_field_errors %}
+                    <div class="alert alert-danger">
+                      {{ error|escape }}
+                    </div>
+                  {% endfor %}
+                {% endif %}
+                {% if field.help_text %}
+                  <small id="{{ form.post.id_for_label }}"
+                         class="form-text text-muted">
+                    {{ form.post.help_text|safe }}
+                  </small>
+                {% endif %}
               </div>
               <div class="form-group row my-3 p-3">
                 <label for="id_group">
                   {{ form.group.label }}
                 </label>
                 {{ form.group|addclass:'form-control' }}
-                <small id="id_group-help" class="form-text text-muted">
-                  Группа, к которой будет относиться пост
-                </small>
+                {% if field.help_text %}
+                  <small id="{{ form.group.id_for_label }}"
+                         class="form-text text-muted">
+                    {{ form.group.help_text|safe }}
+                  </small>
+                {% endif %}
+
               </div>
               <div class="d-flex justify-content-end">
                 <button type="submit" class="btn btn-primary">
