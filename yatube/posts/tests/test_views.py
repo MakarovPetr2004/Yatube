@@ -79,3 +79,26 @@ class PostViewTests(TestCase):
                 self.assertEqual(post_text_0, 'Тестовый текст')
                 self.assertEqual(post_author_0, PostViewTests.author_create)
                 self.assertEqual(post_group_0, PostViewTests.group)
+
+
+    def test_post_detail_page_show_correct_context(self):
+        """Тест для проверки: Правильный context для страницы page_detail"""
+        response = self.authorized_client.get(
+            reverse(
+                'posts:post_detail',
+                kwargs={'post_id': PostViewTests.post.id},
+            )
+        )
+        self.assertEqual(response.context.get('post').text, 'Тестовый текст')
+        self.assertEqual(
+            response.context.get('post').author,
+            PostViewTests.author_create,
+        )
+        self.assertEqual(
+            response.context.get('post').group,
+            PostViewTests.group,
+        )
+        self.assertEqual(
+            response.context.get('title'),
+            PostViewTests.post.text[:30]
+        )
