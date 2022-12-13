@@ -57,8 +57,8 @@ class PostURLTests(TestCase):
             ),
             f'/profile/{PostURLTests.author_create.username}/':
                 self.guest_client.get(
-                f'/profile/{PostURLTests.author_create.username}/'
-            ),
+                    f'/profile/{PostURLTests.author_create.username}/'
+                ),
             f'/posts/{PostURLTests.post.id}/edit/': self.authorized_client.get(
                 f'/posts/{PostURLTests.post.id}/edit/'
             ),

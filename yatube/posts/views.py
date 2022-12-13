@@ -45,7 +45,6 @@ def profile(request, username):
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     context = {
-        'author': user,
         'page_obj': page_obj,
     }
     return render(request, template, context)
