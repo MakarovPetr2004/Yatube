@@ -1,13 +1,20 @@
+import shutil
+import tempfile
+
 from django import forms
+from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.test import TestCase, Client
+from django.core.files.uploadedfile import SimpleUploadedFile
+from django.test import TestCase, Client, override_settings
 from django.urls import reverse
 
-from ..models import Post, Group
+from ..models import Post, Group, Comment
 
 User = get_user_model()
+TEMP_MEDIA_ROOT = tempfile.mkdtemp(dir=settings.BASE_DIR)
 
 
+@override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
 class PostViewTests(TestCase):
     @classmethod
     def setUpClass(cls):
@@ -18,66 +25,32 @@ class PostViewTests(TestCase):
             description='Тестовое описание',
         )
         cls.author_create = User.objects.create_user(username='author')
-        cls.post = Post.objects.create(
-            text='Тестовый текст',
-            author=PostViewTests.author_create,
-            group=PostViewTests.group
+        cls.small_gif = (
+            b'\x47\x49\x46\x38\x39\x61\x02\x00'
+            b'\x01\x00\x80\x00\x00\x00\x00\x00'
+            b'\xFF\xFF\xFF\x21\xF9\x04\x00\x00'
+            b'\x00\x00\x00\x2C\x00\x00\x00\x00'
+            b'\x02\x00\x01\x00\x00\x02\x02\x0C'
+            b'\x0A\x00\x3B'
         )
-        cls.post1 = Post.objects.create(
-            text='Тестовый текст1',
-            author=PostViewTests.author_create,
-            group=PostViewTests.group
+        cls.uploaded = SimpleUploadedFile(
+            name='small.gif',
+            content=cls.small_gif,
+            content_type='image/gif'
         )
-        cls.post2 = Post.objects.create(
-            text='Тестовый текст2',
-            author=PostViewTests.author_create,
-            group=PostViewTests.group
-        )
-        cls.post3 = Post.objects.create(
-            text='Тестовый текст3',
-            author=PostViewTests.author_create,
-            group=PostViewTests.group
-        )
-        cls.post4 = Post.objects.create(
-            text='Тестовый текст4',
-            author=PostViewTests.author_create,
-            group=PostViewTests.group
-        )
-        cls.post5 = Post.objects.create(
-            text='Тестовый текст5',
-            author=PostViewTests.author_create,
-            group=PostViewTests.group
-        )
-        cls.post6 = Post.objects.create(
-            text='Тестовый текст6',
-            author=PostViewTests.author_create,
-            group=PostViewTests.group
-        )
-        cls.post7 = Post.objects.create(
-            text='Тестовый текст7',
-            author=PostViewTests.author_create,
-            group=PostViewTests.group
-        )
-        cls.post8 = Post.objects.create(
-            text='Тестовый текст8',
-            author=PostViewTests.author_create,
-            group=PostViewTests.group
-        )
-        cls.post9 = Post.objects.create(
-            text='Тестовый текст9',
-            author=PostViewTests.author_create,
-            group=PostViewTests.group
-        )
-        cls.post10 = Post.objects.create(
-            text='Тестовый текст10',
-            author=PostViewTests.author_create,
-            group=PostViewTests.group
-        )
-        cls.post11 = Post.objects.create(
-            text='Тестовый текст11',
-            author=PostViewTests.author_create,
-            group=PostViewTests.group
-        )
+        cls.objs = (Post(
+            id=i + 1,
+            text=f'Тестовый текст{i}',
+            author=cls.author_create,
+            group=cls.group,
+            image=cls.uploaded,
+        ) for i in range(12))
+        cls.test_posts = Post.objects.bulk_create(cls.objs)
+
+    @classmethod
+    def tearDownClass(cls):
+        super().tearDownClass()
+        shutil.rmtree(TEMP_MEDIA_ROOT, ignore_errors=True)
 
     def setUp(self):
         self.guest_client = Client()
@@ -94,7 +67,7 @@ class PostViewTests(TestCase):
             ): 'group_list.html',
             reverse(
                 'posts:post_detail',
-                kwargs={'post_id': PostViewTests.post.id},
+                kwargs={'post_id': PostViewTests.test_posts[0].id},
             ): 'post_detail.html',
             reverse(
                 'posts:profile',
@@ -102,7 +75,7 @@ class PostViewTests(TestCase):
             ): 'profile.html',
             reverse(
                 'posts:post_edit',
-                kwargs={'post_id': PostViewTests.post.id},
+                kwargs={'post_id': PostViewTests.test_posts[0].id},
             ): 'create_post.html',
             reverse('posts:post_create'): 'create_post.html',
         }
@@ -133,19 +106,24 @@ class PostViewTests(TestCase):
                 post_text_0 = first_object.text
                 post_author_0 = first_object.author
                 post_group_0 = first_object.group
+                post_image_0 = first_object.image
                 self.assertEqual(post_text_0, 'Тестовый текст11')
                 self.assertEqual(post_author_0, PostViewTests.author_create)
                 self.assertEqual(post_group_0, PostViewTests.group)
+                self.assertEqual(
+                    post_image_0,
+                    PostViewTests.test_posts[-1].image
+                )
 
     def test_post_detail_page_show_correct_context(self):
         """Тест для проверки: Правильный context для страницы page_detail"""
         response = self.authorized_client.get(
             reverse(
                 'posts:post_detail',
-                kwargs={'post_id': PostViewTests.post.id},
+                kwargs={'post_id': PostViewTests.test_posts[0].id},
             )
         )
-        self.assertEqual(response.context.get('post').text, 'Тестовый текст')
+        self.assertEqual(response.context.get('post').text, 'Тестовый текст0')
         self.assertEqual(
             response.context.get('post').author,
             PostViewTests.author_create,
@@ -156,7 +134,7 @@ class PostViewTests(TestCase):
         )
         self.assertEqual(
             response.context.get('title'),
-            PostViewTests.post.text[:30]
+            PostViewTests.test_posts[0].text[:30]
         )
 
     def test_create_edit_page_forms(self):
@@ -167,7 +145,7 @@ class PostViewTests(TestCase):
             )),
             'posts:post_edit': self.authorized_client.get(reverse(
                 'posts:post_edit',
-                kwargs={'post_id': PostViewTests.post.id},
+                kwargs={'post_id': PostViewTests.test_posts[0].id},
             )),
         }
         form_fields = {
@@ -225,3 +203,45 @@ class PostViewTests(TestCase):
         for page, response in response_page.items():
             with self.subTest(page=page):
                 self.assertEqual(len(response.context['page_obj']), 2)
+
+
+class CommentViewTests(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.author_create = User.objects.create_user(username='author')
+        cls.post = Post.objects.create(
+            text='Тестовый текст',
+            author= cls.author_create,
+        )
+        cls.comment = Comment.objects.create(
+            text='Тестовый текст для комментария',
+            author=cls.author_create,
+            post=cls.post,
+        )
+
+    def setUp(self):
+        self.guest_client = Client()
+        self.authorized_client = Client()
+        self.authorized_client.force_login(PostViewTests.author_create)
+
+    def comment_on_post_detail_page(self):
+        """Тест для проверки: добавления комментария на страницу post_detail"""
+        response = self.authorized_client.get(
+            reverse(
+                'posts:post_detail',
+                kwargs={'post_id': PostViewTests.post.id},
+            )
+        )
+        self.first_comment = response.context.get('comments')[0]
+        self.assertEqual(
+            self.first_comment.text,
+            'Тестовый текст для комментария',
+        )
+        self.assertEqual(
+            self.first_comment.author,
+            PostViewTests.author_create,
+        )
+        self.assertEqual(
+            self.first_comment.post,
+            PostViewTests.group,
+        )

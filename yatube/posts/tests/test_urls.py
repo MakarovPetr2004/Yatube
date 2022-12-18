@@ -20,7 +20,7 @@ class PostURLTests(TestCase):
         cls.author_create = User.objects.create_user(username='author')
         cls.post = Post.objects.create(
             text='Тестовый текст',
-            author=PostURLTests.author_create,
+            author=cls.author_create,
         )
 
     def setUp(self):
@@ -58,7 +58,7 @@ class PostURLTests(TestCase):
             f'/profile/{PostURLTests.author_create.username}/':
                 self.guest_client.get(
                     f'/profile/{PostURLTests.author_create.username}/'
-                ),
+            ),
             f'/posts/{PostURLTests.post.id}/edit/': self.authorized_client.get(
                 f'/posts/{PostURLTests.post.id}/edit/'
             ),
