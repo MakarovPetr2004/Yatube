@@ -7,8 +7,8 @@ from django.test import Client, TestCase, override_settings
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 
-from ..forms import PostForm
-from ..models import Post, Group
+from ..forms import PostForm, CommentForm
+from ..models import Post, Group, Comment
 
 User = get_user_model()
 TEMP_MEDIA_ROOT = tempfile.mkdtemp(dir=settings.BASE_DIR)
@@ -77,7 +77,7 @@ class PostCreateFormTests(TestCase):
             Post.objects.filter(
                 text='Тестовый текст',
                 group=PostCreateFormTests.group,
-                author=self.author_create,
+                author=PostCreateFormTests.author_create,
                 image='posts/small.gif'
             ).exists()
         )
@@ -106,7 +106,7 @@ class PostCreateFormTests(TestCase):
             Post.objects.filter(
                 text='Новый тестовый текст',
                 group=PostCreateFormTests.group,
-                author=self.author_create,
+                author=PostCreateFormTests.author_create,
             ).exists()
         )
 
@@ -144,6 +144,72 @@ class PostCreateFormTests(TestCase):
             Post.objects.filter(
                 text='Новый тестовый текст',
                 group=PostCreateFormTests.group,
-                author=self.author_create,
+                author=PostCreateFormTests.author_create,
+            ).exists()
+        )
+
+
+class CommentCreateFormTests(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.author_create = User.objects.create_user(username='author')
+        cls.post = Post.objects.create(
+            text='Тестовый текст',
+            author=cls.author_create,
+        )
+        cls.form = CommentForm()
+
+    def setUp(self):
+        self.guest_client = Client()
+        self.authorized_client = Client()
+        self.authorized_client.force_login(
+            CommentCreateFormTests.author_create
+        )
+
+    def test_guest_can_not_create_comment(self):
+        """
+        Незарегистрированный пользователь не может оставить комментарий
+        """
+        comment_count = Comment.objects.count()
+        form_data = {
+            'text': 'Тестовый текст',
+            'post': CommentCreateFormTests.post
+        }
+        response = self.guest_client.post(
+            reverse(
+                'posts:add_comment',
+                kwargs={'post_id': CommentCreateFormTests.post.id}
+            ),
+            data=form_data,
+            follow=True
+        )
+        self.assertRedirects(response, '/auth/login/?next=/posts/1/comment/')
+        self.assertEqual(Comment.objects.count(), comment_count)
+
+    def test_add_comment(self):
+        """Валидная форма создает запись в Post."""
+        comment_count = Comment.objects.count()
+        form_data = {
+            'text': 'Тестовый текст комментария',
+            'post': CommentCreateFormTests.post,
+        }
+        response = self.authorized_client.post(
+            reverse(
+                'posts:add_comment',
+                kwargs={'post_id': CommentCreateFormTests.post.id},
+            ),
+            data=form_data,
+            follow=True
+        )
+        self.assertRedirects(response, reverse(
+            'posts:post_detail',
+            kwargs={'post_id': CommentCreateFormTests.post.id}
+        ))
+        self.assertEqual(Comment.objects.count(), comment_count + 1)
+        self.assertTrue(
+            Comment.objects.filter(
+                text='Тестовый текст комментария',
+                author=CommentCreateFormTests.author_create,
             ).exists()
         )

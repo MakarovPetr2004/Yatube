@@ -2,15 +2,16 @@ from http import HTTPStatus
 
 from django.contrib.auth import get_user_model
 from django.test import TestCase, Client
+from django.core.cache import cache
 
-from ..models import Post, Group
+from posts.models import Post, Group
 
 User = get_user_model()
 
 
 class PostURLTests(TestCase):
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(cls) -> None:
         super().setUpClass()
         cls.group = Group.objects.create(
             title='Тестовая группа',
@@ -23,10 +24,11 @@ class PostURLTests(TestCase):
             author=cls.author_create,
         )
 
-    def setUp(self):
+    def setUp(self) -> None:
         self.guest_client = Client()
         self.authorized_client = Client()
         self.authorized_client.force_login(PostURLTests.author_create)
+        cache.clear()
 
     def test_urls_uses_correct_template(self):
         """Тест для проверки: URL-адрес использует соответствующий шаблон."""
@@ -98,4 +100,8 @@ class PostURLTests(TestCase):
                 self.assertEqual(
                     user.get('/unexciting_page/').status_code,
                     HTTPStatus.NOT_FOUND,
+                )
+                self.assertTemplateUsed(
+                    user.get('/unexciting_page/'),
+                    'core/404.html'
                 )

@@ -43,15 +43,17 @@
                 Выйти
               </a>
             </li>
-            <li>
-              Пользователь:
-              <a href="{% url 'posts:profile' username=user.username %}">
-                {{ user.username }}
+            <li class="nav-item">
+              <a
+                      href="{% url 'posts:profile' username=user.username %}"
+                      class="nav-link link-light"
+              >
+                Пользователь: {{ user.username }}
               </a>
             </li>
           {% else %}
             <li class="nav-item">
-              <a class="nav-link link-light
+              <a class="nav-link link-dark
               {% if view_name  == 'users:login' %}
                 active
               {% endif %}"

@@ -2,18 +2,20 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.shortcuts import render, get_object_or_404, redirect
+from django.views.decorators.cache import cache_page
 
-from .forms import PostForm, CommentForm
-from .models import Post, Group, Comment
+from posts.forms import PostForm, CommentForm
+from posts.models import Post, Group, Comment, Follow
 
 SYMBOLS_IN_TITLE = 30
 
 User = get_user_model()
 
 
+@cache_page(20, key_prefix='index_page')
 def index(request):
     template = 'posts/index.html'
-    post_list = Post.objects.order_by('-pub_date')
+    post_list = Post.objects.all()
     paginator = Paginator(post_list, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
@@ -26,7 +28,7 @@ def index(request):
 def group_posts(request, slug):
     template = 'posts/group_list.html'
     group = get_object_or_404(Group, slug=slug)
-    posts = Post.objects.filter(group=group).order_by('-pub_date')
+    posts = Post.objects.filter(group=group)
     paginator = Paginator(posts, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
@@ -39,14 +41,18 @@ def group_posts(request, slug):
 
 def profile(request, username):
     template = 'posts/profile.html'
-    user = get_object_or_404(User, username=username)
-    post_list = Post.objects.filter(author=user).order_by('-pub_date')
+    user = request.user
+    author = get_object_or_404(User, username=username)
+    post_list = Post.objects.filter(author=user)
     paginator = Paginator(post_list, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
+    follows = Follow.objects.filter(author=author).filter(user=user)
+    following = True if follows.count() else False
     context = {
-        'author': user,
+        'author': author,
         'page_obj': page_obj,
+        'following': following,
     }
     return render(request, template, context)
 
@@ -111,3 +117,37 @@ def add_comment(request, post_id):
         comment.post = post
         comment.save()
     return redirect('posts:post_detail', post_id=post_id)
+
+
+@login_required
+def follow_index(request):
+    post_list = Post.objects.filter(author__following__user=request.user)
+    paginator = Paginator(post_list, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    context = {
+        'follow': True,
+        'page_obj': page_obj,
+    }
+    return render(request, 'posts/follow.html', context)
+
+
+@login_required
+def profile_follow(request, username):
+    author = get_object_or_404(User, username=username)
+    user = request.user
+    follow = Follow.objects.create(
+        user=user,
+        author=author,
+    )
+    follow.save()
+    return redirect('posts:profile', username=username)
+
+
+@login_required
+def profile_unfollow(request, username):
+    author = get_object_or_404(User, username=username)
+    user = request.user
+    follow = get_object_or_404(Follow, author=author, user=user)
+    follow.delete()
+    return redirect('posts:profile', username=username)

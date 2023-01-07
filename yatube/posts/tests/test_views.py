@@ -7,8 +7,9 @@ from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, Client, override_settings
 from django.urls import reverse
+from django.core.cache import cache
 
-from ..models import Post, Group, Comment
+from posts.models import Post, Group, Comment, Follow
 
 User = get_user_model()
 TEMP_MEDIA_ROOT = tempfile.mkdtemp(dir=settings.BASE_DIR)
@@ -56,6 +57,7 @@ class PostViewTests(TestCase):
         self.guest_client = Client()
         self.authorized_client = Client()
         self.authorized_client.force_login(PostViewTests.author_create)
+        cache.clear()
 
     def test_views_uses_correct_template(self):
         """Тест для проверки: view использует соответствующий шаблон."""
@@ -81,7 +83,7 @@ class PostViewTests(TestCase):
         }
         for view, template in templates_pages_names.items():
             with self.subTest(view=view):
-                response = self.authorized_client.get(f'posts:{view}')
+                response = self.authorized_client.get(view)
                 self.assertTemplateUsed(response, f'posts/{template}')
 
     def test_index_profile_group_page_show_correct_context(self):
@@ -120,10 +122,10 @@ class PostViewTests(TestCase):
         response = self.authorized_client.get(
             reverse(
                 'posts:post_detail',
-                kwargs={'post_id': PostViewTests.test_posts[0].id},
+                kwargs={'post_id': PostViewTests.test_posts[-1].id},
             )
         )
-        self.assertEqual(response.context.get('post').text, 'Тестовый текст0')
+        self.assertEqual(response.context.get('post').text, 'Тестовый текст11')
         self.assertEqual(
             response.context.get('post').author,
             PostViewTests.author_create,
@@ -133,8 +135,12 @@ class PostViewTests(TestCase):
             PostViewTests.group,
         )
         self.assertEqual(
+            response.context.get('post').image,
+            PostViewTests.test_posts[-1].image
+        )
+        self.assertEqual(
             response.context.get('title'),
-            PostViewTests.test_posts[0].text[:30]
+            PostViewTests.test_posts[-1].text[:30]
         )
 
     def test_create_edit_page_forms(self):
@@ -208,10 +214,11 @@ class PostViewTests(TestCase):
 class CommentViewTests(TestCase):
     @classmethod
     def setUpClass(cls):
+        super().setUpClass()
         cls.author_create = User.objects.create_user(username='author')
         cls.post = Post.objects.create(
             text='Тестовый текст',
-            author= cls.author_create,
+            author=cls.author_create,
         )
         cls.comment = Comment.objects.create(
             text='Тестовый текст для комментария',
@@ -222,26 +229,121 @@ class CommentViewTests(TestCase):
     def setUp(self):
         self.guest_client = Client()
         self.authorized_client = Client()
-        self.authorized_client.force_login(PostViewTests.author_create)
+        self.authorized_client.force_login(CommentViewTests.author_create)
 
-    def comment_on_post_detail_page(self):
+    def test_comment_on_post_detail_page(self):
         """Тест для проверки: добавления комментария на страницу post_detail"""
         response = self.authorized_client.get(
             reverse(
                 'posts:post_detail',
-                kwargs={'post_id': PostViewTests.post.id},
+                kwargs={'post_id': CommentViewTests.post.id},
             )
         )
-        self.first_comment = response.context.get('comments')[0]
+        first_comment = response.context.get('comments')[0]
         self.assertEqual(
-            self.first_comment.text,
+            first_comment.text,
             'Тестовый текст для комментария',
         )
         self.assertEqual(
-            self.first_comment.author,
-            PostViewTests.author_create,
+            first_comment.author,
+            CommentViewTests.author_create,
         )
         self.assertEqual(
-            self.first_comment.post,
-            PostViewTests.group,
+            first_comment.post,
+            CommentViewTests.post,
         )
+
+
+class CacheViewTests(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.author_create = User.objects.create_user(username='author')
+        cls.post = Post.objects.create(
+            text='Тестовый текст',
+            author=cls.author_create,
+        )
+
+    def setUp(self):
+        self.authorized_client = Client()
+        self.authorized_client.force_login(CacheViewTests.author_create)
+
+    def test_comment_on_post_detail_page(self):
+        """Тест для проверки: кеширования главной страницы"""
+        response = self.authorized_client.get(reverse('posts:index'))
+        post_count = response.content
+        CacheViewTests.post.delete()
+        response = self.authorized_client.get(reverse('posts:index'))
+        self.assertEqual(
+            response.content,
+            post_count
+        )
+        cache.clear()
+        response = self.authorized_client.get(reverse('posts:index'))
+        self.assertNotEqual(
+            response.content,
+            post_count
+        )
+
+
+class FollowViewTests(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.author_create = User.objects.create_user(username='author')
+        cls.user_create = User.objects.create_user(username='user')
+        cls.follower = User.objects.create_user(username='follower')
+        cls.follow_follower_author = Follow.objects.create(
+            author=cls.author_create,
+            user=cls.follower,
+        )
+        cls.post = Post.objects.create(
+            author=cls.author_create,
+            text='Тестовый текст'
+        )
+
+    def setUp(self):
+        self.authorized_client = Client()
+        self.authorized_client.force_login(FollowViewTests.user_create)
+        self.follower_client = Client()
+        self.follower_client.force_login(FollowViewTests.follower)
+
+    def test_follow_view(self):
+        self.authorized_client.get(
+            reverse(
+                'posts:profile_follow',
+                kwargs={'username': FollowViewTests.author_create.username},
+            )
+        )
+        self.assertEqual(
+            Follow.objects.filter(user=FollowViewTests.user_create).count(),
+            1
+        )
+
+    def test_unfollow_view(self):
+        self.authorized_client.get(
+            reverse(
+                'posts:profile_unfollow',
+                kwargs={'username': FollowViewTests.author_create.username},
+            )
+        )
+        self.assertEqual(
+            Follow.objects.filter(user=FollowViewTests.user_create).count(),
+            0
+        )
+
+    def test_author_posts_for_followers(self):
+        client_count_posts = {
+            self.authorized_client: 0,
+            self.follower_client: 1
+        }
+        for client, posts_count in client_count_posts.items():
+            with self.subTest(client=client):
+                response = client.get(
+                    reverse('posts:follow_index')
+                )
+                posts_counter = len(response.context.get('page_obj'))
+                self.assertEqual(
+                    posts_counter,
+                    posts_count
+                )
