@@ -10,13 +10,19 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '=u$+!uxzeimkk5e7bnrb%hdek9=+vg49#$6w-q07jm^@v6*tv_'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
     '[::1]',
     'testserver',
+    'www.nintiko.pythonanywhere.com',
+    'nintiko.pythonanywhere.com',
+]
+
+INTERNAL_IPS = [
+    '127.0.0.1',
 ]
 
 CSRF_FAILURE_VIEW = 'core.views.csrf_failure'
@@ -55,6 +61,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'sorl.thumbnail',
+    'debug_toolbar',
+
 ]
 
 MIDDLEWARE = [
@@ -65,6 +73,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
 
 ROOT_URLCONF = 'yatube.urls'

@@ -22,8 +22,7 @@
               {% if is_edit %}
                 <form method="post"
                       action="{% url 'posts:post_edit' post_id=post.pk %}"
-                      enctype="multipart/form-data"
-                >
+                      enctype="multipart/form-data">
               {% else %}
                 <form method="post"
                       action="{% url 'posts:post_create' %}"

@@ -41,14 +41,14 @@ def group_posts(request, slug):
 
 def profile(request, username):
     template = 'posts/profile.html'
-    user = request.user
     author = get_object_or_404(User, username=username)
-    post_list = Post.objects.filter(author=user)
+    post_list = Post.objects.filter(author=author)
     paginator = Paginator(post_list, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
-    follows = Follow.objects.filter(author=author).filter(user=user)
-    following = True if follows.count() else False
+    following = request.user.is_authenticated and author.following.filter(
+        user=request.user
+    ).exists()
     context = {
         'author': author,
         'page_obj': page_obj,
@@ -121,8 +121,8 @@ def add_comment(request, post_id):
 
 @login_required
 def follow_index(request):
-    post_list = Post.objects.filter(author__following__user=request.user)
-    paginator = Paginator(post_list, 10)
+    posts = Post.objects.filter(author__following__user=request.user)
+    paginator = Paginator(posts, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     context = {
@@ -135,19 +135,17 @@ def follow_index(request):
 @login_required
 def profile_follow(request, username):
     author = get_object_or_404(User, username=username)
-    user = request.user
-    follow = Follow.objects.create(
-        user=user,
-        author=author,
-    )
-    follow.save()
+    if request.user != author:
+        Follow.objects.get_or_create(
+            user=request.user,
+            author=author,
+        )
     return redirect('posts:profile', username=username)
 
 
 @login_required
 def profile_unfollow(request, username):
     author = get_object_or_404(User, username=username)
-    user = request.user
-    follow = get_object_or_404(Follow, author=author, user=user)
+    follow = get_object_or_404(Follow, author=author, user=request.user)
     follow.delete()
     return redirect('posts:profile', username=username)

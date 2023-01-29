@@ -30,6 +30,9 @@ class GroupAdmin(admin.ModelAdmin):
     empty_value_display = '-пусто-'
 
 
+admin.site.register(Group, GroupAdmin)
+
+
 class FollowAdmin(admin.ModelAdmin):
     list_display = (
         'pk',
