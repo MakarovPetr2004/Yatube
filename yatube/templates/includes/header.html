@@ -1,76 +1,110 @@
 {% load static %}
 <header>
-  <nav class="navbar navbar-light" style="background-color: lightskyblue">
+  <nav class="navbar navbar-expand-lg navbar-light"
+       style="background-color: lightskyblue">
     <div class="container">
       <a class="navbar-brand" href="{% url 'posts:index' %}">
         <img src="{% static 'img/logo.png' %}" width="30" height="30"
              class="d-inline-block align-top" alt="">
         <span style="color:red">Ya</span>tube
       </a>
-      {% with request.resolver_match.view_name as view_name %}
-        <ul class="nav nav-pills">
-          <li class="nav-item">
-            <a class="nav-link
-              {% if view_name  == 'about:author' %}
-                active
-              {% endif %}"
-               href="{% url 'about:author' %}">Об авторе</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link
-              {% if view_name  == 'about:tech' %}
-                active
-              {% endif %}"
-               href="{% url 'about:tech' %}">Технологии</a>
-          </li>
-          {% if user.is_authenticated %}
+      <button class="navbar-toggler ms-auto" type="button" data-toggle="collapse"
+              data-target="#navbarNav" aria-controls="navbarNav"
+              aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        {% with request.resolver_match.view_name as view_name %}
+          <ul class="nav nav-pills ms-auto">
             <li class="nav-item">
               <a class="nav-link
-              {% if view_name  == 'posts:post_create' %}
-                active
-              {% endif %}"
-                 href="{% url 'posts:post_create' %}">Новая запись</a>
+                    {% if view_name  == 'about:author' %}
+                      active
+                    {% endif %}"
+                 href="{% url 'about:author' %}">Об авторе</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link link-light" href="">Изменить пароль</a>
+              <a class="nav-link
+                    {% if view_name  == 'about:tech' %}
+                      active
+                    {% endif %}"
+                 href="{% url 'about:tech' %}">Технологии</a>
             </li>
-            <li class="nav-item">
-              <a class="nav-link link-light
-              {% if view_name  == 'users:logout' %}
-                active
-              {% endif %}"
-                 href="{% url 'users:logout' %}">
-                Выйти
-              </a>
-            </li>
-            <li class="nav-item">
-              <a
-                      href="{% url 'posts:profile' username=user.username %}"
-                      class="nav-link link-light"
-              >
-                Пользователь: {{ user.username }}
-              </a>
-            </li>
-          {% else %}
-            <li class="nav-item">
-              <a class="nav-link link-dark
-              {% if view_name  == 'users:login' %}
-                active
-              {% endif %}"
-                 href="{% url 'users:login' %}">Войти</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link link-light
-              {% if view_name  == 'users:signup' %}
-                active
-              {% endif %}"
-                 href="{% url 'users:signup' %}">
-                Регистрация
-              </a>
-            </li>
-          {% endif %}
-        </ul>
-      {% endwith %}
+            {% if user.is_authenticated %}
+              <li class="nav-item">
+                <a class="nav-link
+                    {% if view_name  == 'posts:post_create' %}
+                      active
+                    {% endif %}"
+                   href="{% url 'posts:post_create' %}">Новая запись</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link link-light" href="">Изменить пароль</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link link-light
+                    {% if view_name  == 'users:logout' %}
+                      active
+                    {% endif %}"
+                   href="{% url 'users:logout' %}">
+                  Выйти
+                </a>
+              </li>
+              <li class="nav-item">
+                <a
+                        href="{% url 'posts:profile' username=user.username %}"
+                        class="nav-link link-light"
+                >
+                  Пользователь: {{ user.username }}
+                </a>
+              </li>
+            {% else %}
+              <li class="nav-item">
+                <a class="nav-link link-dark
+                    {% if view_name  == 'users:login' %}
+                      active
+                    {% endif %}"
+                   href="{% url 'users:login' %}">Войти</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link link-light
+                    {% if view_name  == 'users:signup' %}
+                      active
+                    {% endif %}"
+                   href="{% url 'users:signup' %}">
+                  Регистрация
+                </a>
+              </li>
+            {% endif %}
+          </ul>
+        {% endwith %}
+      </div>
     </div>
   </nav>
+  {#  <nav class="navbar navbar-expand-md navbar-dark bg-primary">#}
+  {#    <div class="container-fluid">#}
+  {#        <a class="navbar-brand abs" href="#">Navbar 1</a>#}
+  {#        <button class="navbar-toggler ms-auto" type="button" data-bs-toggle="collapse" data-bs-target="#collapseNavbar">#}
+  {#            <span class="navbar-toggler-icon"></span>#}
+  {#        </button>#}
+  {#        <div class="navbar-collapse collapse" id="collapseNavbar">#}
+  {#            <ul class="navbar-nav">#}
+  {#                <li class="nav-item active">#}
+  {#                    <a class="nav-link" href="#">Link</a>#}
+  {#                </li>#}
+  {#                <li class="nav-item">#}
+  {#                    <a class="nav-link" href="//codeply.com">Codeply</a>#}
+  {#                </li>#}
+  {#                <li class="nav-item">#}
+  {#                    <a class="nav-link" href="#myAlert" data-bs-toggle="collapse">Link</a>#}
+  {#                </li>#}
+  {#            </ul>#}
+  {#            <ul class="navbar-nav ms-auto">#}
+  {#                <li class="nav-item">#}
+  {#                    <a class="nav-link" href="" data-bs-target="#myModal" data-bs-toggle="modal">About</a>#}
+  {#                </li>#}
+  {#            </ul>#}
+  {#        </div>#}
+  {#    </div>#}
+  {#</nav>#}
 </header>
