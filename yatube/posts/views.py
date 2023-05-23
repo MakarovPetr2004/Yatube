@@ -14,7 +14,7 @@ SYMBOLS_IN_TITLE = 30
 User = get_user_model()
 
 
-@cache_page(20, key_prefix='index_page')
+# @cache_page(20, key_prefix='index_page')
 def index(request):
     template = 'posts/index.html'
     post_list = Post.objects.all()
