@@ -7,3 +7,7 @@ sqlparse==0.4.3
 tomli==2.0.1
 typing_extensions==4.4.0
 django-debug-toolbar==3.2.4
+Pillow==9.4.0
+sorl-thumbnail==12.9.0
+djangorestframework~=3.14.0
+djoser==2.1.0

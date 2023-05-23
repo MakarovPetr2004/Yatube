@@ -4,8 +4,10 @@ from django.core.paginator import Paginator
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.decorators.cache import cache_page
 
-from posts.forms import PostForm, CommentForm
-from posts.models import Post, Group, Comment, Follow
+from rest_framework.viewsets import ModelViewSet
+
+from .forms import PostForm, CommentForm
+from .models import Post, Group, Comment, Follow
 
 SYMBOLS_IN_TITLE = 30
 
