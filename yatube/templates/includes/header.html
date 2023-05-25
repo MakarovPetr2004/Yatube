@@ -1,14 +1,16 @@
 {% load static %}
 <header class="fixed-top" style="width: 100%">
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark"
-       >
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary"
+  >
     <div class="container">
       <a class="navbar-brand" href="{% url 'posts:index' %}">
         <img src="{% static 'img/logo.png' %}" width="30" height="30"
              class="d-inline-block align-top" alt="">
-        <span style="color:red">Ya</span>tube
+        Yatube
       </a>
-      <button style="border: none !important;" class="navbar-toggler shadow-none" type="button" data-bs-toggle="collapse"
+      <button style="border: none !important;"
+              class="navbar-toggler shadow-none" type="button"
+              data-bs-toggle="collapse"
               data-bs-target="#navbarSupportedContent"
               aria-controls="navbarSupportedContent" aria-expanded="false"
               aria-label="Toggle navigation">
@@ -17,19 +19,37 @@
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         {% with request.resolver_match.view_name as view_name %}
           <ul class="nav navbar-nav ms-auto align-items-right">
-            <li class="nav-item">
-              <a class="nav-link
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#"
+                 id="navbarDropdownMenuLink" role="button"
+                 data-bs-toggle="dropdown" aria-expanded="false">
+                О нас
+              </a>
+              <ul class="dropdown-menu bg-primary ms-3"
+                  aria-labelledby="navbarDropdownMenuLink"
+                  style="border: none !important;">
+                <li class="nav-item">
+                  <a class="nav-link
                     {% if view_name  == 'about:author' %}
                       active
                     {% endif %}"
-                 href="{% url 'about:author' %}">Об авторе</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link
+                     href="{% url 'about:author' %}">Об авторе</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link
                     {% if view_name  == 'about:tech' %}
                       active
                     {% endif %}"
-                 href="{% url 'about:tech' %}">Технологии</a>
+                     href="{% url 'about:tech' %}">Технологии</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link
+                    {% if view_name  == 'about:tech' %}
+                      active
+                    {% endif %}"
+                     href="{% url 'about:contacts' %}">Контакты</a>
+                </li>
+              </ul>
             </li>
             {% if user.is_authenticated %}
               <li class="nav-item">

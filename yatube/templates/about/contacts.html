@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block title %}Карта сайта{% endblock %}
+{% block content %}
+  <div class="container py-5">
+    <div class="mb-5">
+      <h1 class="mb-5">Наш адрес</h1>
+      <h2 class="mb-3">Как добраться</h2>
+      <div class="row mb-3 justify-content-between">
+        <div class="col-sm-5 d-block float-start">
+          <h4 class="fw-bold pb-4">Пешеходам</h4>
+          <p>
+            Вам надо доехать на метро до станции
+            «Парк культуры».
+            Если приедете на радиальную, выходите к Комсомольскому проспекту.
+            На
+            кольцевой один выход, там не ошибётесь. На улице поверните направо
+            и,
+            обогнув павильон метро, идите по проспекту. Вам нужен второй
+            поворот
+            направо, перед церковью. Свернув с Комсомольского, вы окажетесь на
+            улице Тимура Фрунзе — идите по ней до красного кирпичного здания,
+            потом ещё немного вдоль него, пока не увидите на стене табличку с
+            логотипом Яндекса и надписью «Теперь налево». Поверните во
+            внутренний
+            двор и поднимитесь по широкой лестнице — вы на месте!Первый подъезд
+            под аркой — главный вход в офис. Вход для курьеров — с улицы Льва
+            Толстого, 16. Ищите дверь с логотипом Яндекса.
+          </p>
+        </div>
+        <div class="col-sm-5 d-block float-end">
+          <h4 class="fw-bold pb-4">Автомобилистам</h4>
+          <p>
+            Подъехать к офису Яндекса можно
+            по улице Льва
+            Толстого или Тимура Фрунзе, ориентируясь на указатели с логотипом
+            компании.
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="row mb-3 justify-content-between">
+      <div class="col-sm-5 d-block float-start">
+        <h4 class="fw-bold pb-4">Карта</h4>
+        <script type="text/javascript" charset="utf-8" async
+                src="https://api-maps.yandex.ru/services/constructor/1.0/js/?um=constructor%3A3c1db213fa2f6b40024684a3e8433ae017ec0eb1ec93ba98dc5118c1e4382e2a&amp;width=500&amp;height=400&amp;lang=ru_RU&amp;scroll=true"></script>
+      </div>
+      <div class="col-sm-5 d-block float-end">
+        <h4 class="fw-bold pb-4">Связь</h4>
+        <table>
+          <tbody>
+          <tr >
+            <td class="fw-bold pe-5 pb-4 align-top"">Колл-центр</td>
+            <td class="text-black-50 pb-4">
+              тел.:&nbsp;
+              <a class="text-decoration-none" href="tel:+74957397000">
+                +7&nbsp;495&nbsp;739-70-00
+              </a>,
+              <br>
+              <a class="text-decoration-none" href="tel:88002509639">
+                8&nbsp;800&nbsp;250-96-39
+              </a>,
+              <a class="text-decoration-none" href="tel:88002509639">
+                8&nbsp;800&nbsp;250-YNDX
+              </a>
+              <br>&nbsp;
+              <a class="text-decoration-none" href="tel:+74959743581">
+                +7&nbsp;495&nbsp;974-35-81</a><br>факс:&nbsp;
+              <a class="text-decoration-none" href="tel:+74957397070">
+                +7&nbsp;495&nbsp;739-70-70
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="fw-bold pe-3 align-top"">Почта</td>
+            <td>
+              <a href="mailto:mr.ru.20042004@gmail.com"
+                 class="text-decoration-none">
+                mr.ru.20042004@gmail.com
+              </a>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+{% endblock %}
