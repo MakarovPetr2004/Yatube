@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Карта сайта{% endblock %}
+{% block content %}
+  <div class="container py-5">
+    <div class="mb-5"><h1>Карта сайта</h1></div>
+    <div>
+      <ul>
+        <li><a href="{% url 'posts:index' %}">Главная страница</a>
+          <ul>
+            <li><a href="{% url 'posts:group_list' slug='titles' %}">Группа Постов</a></li>
+            <li><a href="{% url 'posts:profile' 'leo' %}">Профиль пользователя</a></li>
+            <ul>
+              <li><a href="{% url 'posts:profile_follow' 'leo' %}">Подписаться на пользователя(только для
+                зарегистрированных
+                пользователей)</a></li>
+              <li><a href="{% url 'posts:profile_unfollow' 'leo' %}">Отписаться от Пользователя(только для
+                зарегистрированных
+                пользователей)</a></li>
+            </ul>
+            <li><a href="{% url 'posts:post_detail' 27 %}">Пост</a></li>
+            <ul>
+              <li><a href="{% url 'posts:post_edit' 27 %}">Редактирование поста(только для владельца
+                поста)</a>
+              </li>
+              <li><a href="{% url 'posts:post_detail' '27' %}">Оставить комментарий(только для зарегистрированных
+                пользователей)</a></li>
+            </ul>
+            <li><a href="{% url 'posts:post_create' %}">Создание поста(только для зарегистрированных
+              пользователей)</a></li>
+            <li><a href="{% url 'posts:follow_index' %}">Посты подписанных пользователей(только для
+              зарегистрированных
+              пользователей)</a></li>
+          </ul>
+        </li>
+        <li><a href="{% url 'about:author' %}">О нас</a>
+          <ul>
+            <li><a href="{% url 'about:author' %}">Об авторе</a></li>
+            <li><a href="{% url 'about:tech' %}">Технологии</a></li>
+            <li><a href="{% url 'about:contacts' %}">Контакты</a></li>
+          </ul>
+        </li>
+        <li><a href="{% url 'users:signup' %}">Авторизация</a>
+          <ul>
+            <li><a href="{% url 'users:logout' %}">Выйти(только для зарегистрированных
+              пользователей)</a></li>
+            <li><a href="{% url 'users:signup' %}">Зарегистрироваться</a></li>
+            <li><a href="{% url 'users:login' %}"> Войти</a></li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </div>
+{% endblock %}

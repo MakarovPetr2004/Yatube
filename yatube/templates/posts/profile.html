@@ -7,43 +7,41 @@
 {% endblock %}
 
 {% block content %}
-  <main>
-    <div class="container py-5">
-      <div class="mb-5">
-        <h1>Все посты пользователя {{ author.get_full_name }} </h1>
-        <h3>Всего постов: {{ author.posts.count }} </h3>
-        {% if author != user %}
-          {% if following %}
-            <a class="btn btn-lg btn-light"
-               href="{% url 'posts:profile_unfollow' author.username %}"
-               role="button">
-              Отписаться
-            </a>
-          {% else %}
-            <a class="btn btn-lg btn-primary"
-               href="{% url 'posts:profile_follow' author.username %}"
-               role="button">
-              Подписаться
-            </a>
-          {% endif %}
+  <div class="container py-5">
+    <div class="mb-5">
+      <h1>Все посты пользователя {{ author.get_full_name }} </h1>
+      <h3>Всего постов: {{ author.posts.count }} </h3>
+      {% if author != user %}
+        {% if following %}
+          <a class="btn btn-lg btn-light"
+             href="{% url 'posts:profile_unfollow' author.username %}"
+             role="button">
+            Отписаться
+          </a>
+        {% else %}
+          <a class="btn btn-lg btn-primary"
+             href="{% url 'posts:profile_follow' author.username %}"
+             role="button">
+            Подписаться
+          </a>
         {% endif %}
-      </div>
-      {% for post in page_obj %}
-        <article>
-          {% include 'posts/includes/post_list.html' %}
-          {% if post.group %}
-            <li>
-              <a href="{% url 'posts:group_list' post.group.slug %}">
-                Все записи группы
-              </a>
-            </li>
-          {% endif %}
-          {% if not forloop.last %}
-            <hr>
-          {% endif %}
-        </article>
-      {% endfor %}
-      {% include 'includes/paginator.html' %}
+      {% endif %}
     </div>
-  </main>
+    {% for post in page_obj %}
+      <article>
+        {% include 'posts/includes/post_list.html' %}
+        {% if post.group %}
+          <li>
+            <a href="{% url 'posts:group_list' post.group.slug %}">
+              Все записи группы
+            </a>
+          </li>
+        {% endif %}
+        {% if not forloop.last %}
+          <hr>
+        {% endif %}
+      </article>
+    {% endfor %}
+    {% include 'includes/paginator.html' %}
+  </div>
 {% endblock %}

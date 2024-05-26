@@ -10,6 +10,7 @@ class PostAdmin(admin.ModelAdmin):
         'created',
         'author',
         'group',
+        'created'
     )
     list_editable = ('group',)
     search_fields = ('text',)

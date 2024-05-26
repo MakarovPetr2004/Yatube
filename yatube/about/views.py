@@ -7,3 +7,11 @@ class AboutAuthorView(TemplateView):
 
 class AboutTechView(TemplateView):
     template_name = 'about/tech.html'
+
+
+class AboutWebsiteMapView(TemplateView):
+    template_name = 'about/map.html'
+
+
+class AboutContactsView(TemplateView):
+    template_name = 'about/contacts.html'

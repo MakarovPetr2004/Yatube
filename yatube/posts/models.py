@@ -52,7 +52,7 @@ class Post(CreatedModel):
         ordering = ('-created',)
 
     def __str__(self) -> str:
-        return self.text[:15]
+        return ' '.join(self.text.split(' ')[:3])
 
 
 class Comment(CreatedModel):

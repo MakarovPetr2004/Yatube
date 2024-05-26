@@ -64,7 +64,6 @@ INSTALLED_APPS = [
     'rest_framework',
     'sorl.thumbnail',
     'djoser',
-
 ]
 
 MIDDLEWARE = [
